@@ -1,0 +1,150 @@
+blueprint:
+  name: Ikea Rodret Switch
+  domain: automation  
+  input:
+    switch:
+      name: Light switch
+    target_light:
+      name: Target light entity
+triggers:
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_short_press
+    subtype: turn_on
+    trigger: device
+    id: "on"
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_short_press
+    subtype: turn_off
+    trigger: device
+    id: "off"
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_long_press
+    subtype: dim_up
+    trigger: device
+    id: dimUpStart
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_long_release
+    subtype: dim_up
+    trigger: device
+    id: dimUpStop
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_long_press
+    subtype: dim_down
+    trigger: device
+    id: dimDownStart
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_long_release
+    subtype: dim_down
+    trigger: device
+    id: dimDownStop
+conditions: []
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - "on"
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data: {}
+            target: 
+              entity_id: !input target_lights
+      - conditions:
+          - condition: trigger
+            id:
+              - "off"
+        sequence:
+          - action: light.turn_off
+            metadata: {}
+            data: {}
+            target:
+              entity_id: !input target_lights
+      - conditions:
+          - condition: trigger
+            id:
+              - dimDownStart
+        sequence:
+          - repeat:
+              count: 5
+              sequence:
+                - choose:
+                    - conditions:
+                        - condition: numeric_state
+                          entity_id: !input target_lights
+                          attribute: brightness
+                          above: -9999
+                          below: 2
+                      sequence:
+                        - stop: Minimum brightness
+                    - conditions:
+                        - condition: numeric_state
+                          entity_id: !input target_lights
+                          attribute: brightness
+                          above: 2
+                          below: 52
+                      sequence:
+                        - action: light.turn_on
+                          metadata: {}
+                          data:
+                            transition: 1.5
+                            brightness: 1
+                          target:
+                            entity_id: !input target_lights
+                        - stop: Minimum brightness
+                  default:
+                    - action: light.turn_on
+                      metadata: {}
+                      data:
+                        brightness_step_pct: "-20"
+                        transition: 1.5
+                      target:
+                        entity_id: !input target_lights
+                    - delay:
+                        hours: 0
+                        minutes: 0
+                        seconds: 1.5
+      - conditions:
+          - condition: trigger
+            id:
+              - dimUpStart
+        sequence:
+          - repeat:
+              count: 5
+              sequence:
+                - choose:
+                    - conditions:
+                        - condition: numeric_state
+                          entity_id: !input target_lights
+                          attribute: brightness
+                          above: 254
+                          below: 9999
+                      sequence:
+                        - action: light.turn_on
+                          metadata: {}
+                          data:
+                            transition: 1.5
+                            brightness: 1
+                          target:
+                            entity_id: !input target_lights
+                        - stop: At maximum brightness
+                          error: false
+                  default:
+                    - action: light.turn_on
+                      metadata: {}
+                      data:
+                        brightness_step_pct: 20
+                        transition: 1.5
+                      target:
+                        entity_id: !input target_lights
+                    - delay:
+                        hours: 0
+                        minutes: 0
+                        seconds: 1.5
+mode: restart
