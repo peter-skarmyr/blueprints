@@ -4,7 +4,7 @@ blueprint:
   input:
     switch:
       name: Light switch
-    target_light:
+    target_lights:
       name: Target light entity
 triggers:
   - device_id: !input switch
