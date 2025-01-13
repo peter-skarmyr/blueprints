@@ -4,6 +4,12 @@ blueprint:
   input:
     switch:
       name: Light switch
+      selector:
+        device:
+          filter:
+            integration: zha
+            manufacturer: IKEA of Sweden
+            model: RODRET Dimmer
     target_lights:
       name: Target light entity
       selector:
