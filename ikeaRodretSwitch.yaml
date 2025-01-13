@@ -6,6 +6,19 @@ blueprint:
       name: Light switch
     target_lights:
       name: Target light entity
+      selector:
+        entity:
+          filter:
+            domain: light
+    iterationTimeInSeconds:
+      name: Time per iteration in seconds
+      default: 1.1
+      selector:
+        number:
+          min: 1
+          max: 5
+          step: 1.5
+          unit_of_measurement: s
 triggers:
   - device_id: !input switch
     domain: zha
@@ -93,7 +106,7 @@ actions:
                         - action: light.turn_on
                           metadata: {}
                           data:
-                            transition: 1.5
+                            transition: !input iterationTimeInSeconds
                             brightness: 1
                           target:
                             entity_id: !input target_lights
@@ -103,13 +116,13 @@ actions:
                       metadata: {}
                       data:
                         brightness_step_pct: "-20"
-                        transition: 1.5
+                        transition: !input iterationTimeInSeconds
                       target:
                         entity_id: !input target_lights
                     - delay:
                         hours: 0
                         minutes: 0
-                        seconds: 1.5
+                        seconds: !input iterationTimeInSeconds
       - conditions:
           - condition: trigger
             id:
@@ -129,7 +142,7 @@ actions:
                         - action: light.turn_on
                           metadata: {}
                           data:
-                            transition: 1.5
+                            transition: !input iterationTimeInSeconds
                             brightness: 1
                           target:
                             entity_id: !input target_lights
@@ -140,11 +153,11 @@ actions:
                       metadata: {}
                       data:
                         brightness_step_pct: 20
-                        transition: 1.5
+                        transition: !input iterationTimeInSeconds
                       target:
                         entity_id: !input target_lights
                     - delay:
                         hours: 0
                         minutes: 0
-                        seconds: 1.5
+                        seconds: !input iterationTimeInSeconds
 mode: restart
