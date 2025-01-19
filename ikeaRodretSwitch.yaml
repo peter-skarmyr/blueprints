@@ -86,7 +86,8 @@ actions:
           - condition: trigger
             id:
               - "off"
-          - "{{ !isToggle }}"
+          - condition: template
+            value_template: "{{ is_toggle }}"    
         sequence:
           - action: light.turn_off
             metadata: {}
