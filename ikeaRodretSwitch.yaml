@@ -81,7 +81,7 @@ actions:
           - condition: or
             conditions:   
             - condition: template
-              value_template: "{{ !isToggle }}"   
+              value_template: "{{  not isToggle }}"   
             - condition: state
               entity_id: !input target_lights
               state: "off"    
@@ -96,7 +96,7 @@ actions:
             id:
               - "off"
           - condition: template
-            value_template: "{{ !isToggle }}"    
+            value_template: "{{ not isToggle }}"    
         sequence:
           - action: light.turn_off
             metadata: {}
