@@ -73,11 +73,13 @@ variables:
 actions:
   - choose:
       - conditions:
-        - and: 
+        - condition: and
+          conditions:
           - condition: trigger
             id:
               - "on"
-          - or:    
+          - condition: or
+            conditions:   
             - condition: template
               value_template: "{{ !isToggle }}"   
             - condition: state
