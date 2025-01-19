@@ -87,7 +87,7 @@ actions:
             id:
               - "off"
           - condition: template
-            value_template: "{{ is_toggle }}"    
+            value_template: "{{ isToggle }}"    
         sequence:
           - action: light.turn_off
             metadata: {}
