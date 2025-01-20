@@ -1,0 +1,263 @@
+blueprint:
+  name: Philips hue switch
+  domain: automation  
+  input:
+    switch:
+      name: Light switch
+      selector:
+        device:
+          filter:
+            - integration: zha
+              manufacturer: Signify Netherlands B.V.
+              model: RWL022
+    target_lights:
+      name: Target light entity
+      selector:
+        entity:
+          filter:
+            domain: light
+    iterationTimeInSeconds:
+      name: Time per iteration in seconds
+      default: 1.1
+      selector:
+        number:
+          min: 1
+          max: 5
+          step: 0.1
+          unit_of_measurement: s
+    dimStepPercentageHold:
+      name: How much to dim per iteration when holding to dim
+      default: 25
+      selector:
+        number:
+          min: 20
+          max: 50
+          step: 5
+          unit_of_measurement: "%"
+    dimStepPercentagePress:
+      name: How much to dim press 
+      default: 25
+      selector:
+        number:
+          min: 20
+          max: 50
+          step: 5
+          unit_of_measurement: "%"            
+triggers:
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_short_press
+    subtype: turn_on
+    trigger: device
+    id: "on"
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_short_press
+    subtype: turn_off
+    trigger: device
+    id: "off"
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_long_press
+    subtype: dim_up
+    trigger: device
+    id: dimUpStart
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_short_press
+    subtype: dim_up
+    trigger: device
+    id: dimUpShort 
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_long_release
+    subtype: dim_up
+    trigger: device
+    id: dimUpStop
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_short_release
+    subtype: dim_down
+    trigger: device
+    id: dimUpShort
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_long_press
+    subtype: dim_down
+    trigger: device
+    id: dimDownStart
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_long_release
+    subtype: dim_down
+    trigger: device
+    id: dimDownStop
+conditions: []
+variables: 
+  IsOnButtonToggle: !input IsOnButtonToggle
+  IsOffButtonColorTemperatureSwitch: !input IsOffButtonColorTemperatureSwitch
+actions:
+  - choose:
+      - conditions:
+        - condition: trigger
+          id:
+            - "on"
+        sequence:
+          - action: light.toggle
+            metadata: {}
+            data: {}
+            target: 
+              entity_id: !input target_lights
+      - conditions:
+          - condition: trigger
+            id:
+              - "off"
+            entity_id: !input target_lights   
+        sequence:
+          - choose:
+            - conditions:
+              - condition: trigger
+                id:
+                  - "off"
+                entity_id: !input target_lights
+                attribute: color_temp_kelvin
+                below: 2201   
+              sequence:
+                - action: light.turn_on
+                  metadata: {}
+                  data:
+                    kelvin: 2700
+                  target:
+                    entity_id: !input target_lights
+            - conditions:
+              - condition: trigger
+                id:
+                  - "off"
+                entity_id: !input target_lights
+                attribute: color_temp_kelvin
+                above: 3499   
+              sequence:
+                - action: light.turn_on
+                  metadata: {}
+                  data:
+                    kelvin: 2200
+                  target:
+                    entity_id: !input target_lights 
+            default:
+              - action: light.turn_on
+                metadata: {}
+                data:
+                  kelvin: 3500
+                target:
+                  entity_id: !input target_lights                  
+      - conditions:
+          - condition: trigger
+            id:
+              - "dimDownShort"
+        sequence:
+          - choose: 
+            - conditions:
+              - condition: numeric_state
+                entity_id: !input target_lights
+                attribute: brightness
+                above: input_number.dimStepPercentagePress
+                value_template: "{{ TODO }}"
+              sequence:  
+                - action: light.turn_on
+                  metadata: {}
+                  data:
+                    brightness_step_pct: "{{ -(dimStepPercentagePress) }}" 
+                  target:
+                    entity_id: !input target_lights  
+            default:
+              - action: light.turn_on
+                metadata: {}
+                data:
+                  brightness: 1
+                target:
+                  entity_id: !input target_lights        
+      - conditions:
+          - condition: trigger
+            id:
+              - "dimUpShort"
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              brightness_step_pct: !input dimStepPercentagePress
+            target:
+              entity_id: !input target_lights                                         
+      - conditions:
+          - condition: trigger
+            id:
+              - dimDownStart
+        sequence:
+          - repeat:
+              count: 5
+              sequence:
+                - choose:
+                    - conditions:
+                        - condition: numeric_state
+                          entity_id: !input target_lights
+                          attribute: brightness
+                          above: -9999
+                          below: 2
+                      sequence:
+                        - stop: Minimum brightness
+                    - conditions:
+                        - condition: numeric_state
+                          entity_id: !input target_lights
+                          attribute: brightness
+                          above: 2
+                          below: 52
+                      sequence:
+                        - action: light.turn_on
+                          metadata: {}
+                          data:
+                            transition: !input iterationTimeInSeconds
+                            brightness: 1
+                          target:
+                            entity_id: !input target_lights
+                        - stop: Minimum brightness
+                  default:
+                    - action: light.turn_on
+                      metadata: {}
+                      data:
+                        brightness_step_pct: "{{ -(dimStepPercentageHold) }}"
+                        transition: !input iterationTimeInSeconds
+                      target:
+                        entity_id: !input target_lights
+                    - delay:
+                        hours: 0
+                        minutes: 0
+                        seconds: !input iterationTimeInSeconds
+      - conditions:
+          - condition: trigger
+            id:
+              - dimUpStart
+        sequence:
+          - repeat:
+              count: 5
+              sequence:
+                - choose:
+                    - conditions:
+                        - condition: numeric_state
+                          entity_id: !input target_lights
+                          attribute: brightness
+                          above: 254
+                      sequence:
+                        - stop: At maximum brightness
+                          error: false      
+                  default:
+                    - action: light.turn_on
+                      metadata: {}
+                      data:
+                        brightness_step_pct: !input dimStepPercentageHold
+                        transition: !input iterationTimeInSeconds
+                      target:
+                        entity_id: !input target_lights
+                    - delay:
+                        hours: 0
+                        minutes: 0
+                        seconds: !input iterationTimeInSeconds
+mode: restart
