@@ -78,15 +78,24 @@ actions:
           - condition: trigger
             id:
               - "on"
-          - condition: or
-            conditions:   
-            - condition: template
-              value_template: "{{  not isToggle }}"   
-            - condition: state
-              entity_id: !input target_lights
-              state: "off"    
+        - condition: template
+          value_template: "{{ not isToggle }}"   
         sequence:
           - action: light.turn_on
+            metadata: {}
+            data: {}
+            target: 
+              entity_id: !input target_lights
+      - conditions:
+        - condition: and
+          conditions:
+          - condition: trigger
+            id:
+              - "on"
+        - condition: template
+          value_template: "{{ isToggle }}"   
+        sequence:
+          - action: light.toggle
             metadata: {}
             data: {}
             target: 
