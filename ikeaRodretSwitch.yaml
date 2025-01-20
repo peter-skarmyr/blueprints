@@ -7,9 +7,12 @@ blueprint:
       selector:
         device:
           filter:
-            integration: zha
-            manufacturer: IKEA of Sweden
-            model: RODRET Dimmer
+            - integration: zha
+              manufacturer: IKEA of Sweden
+              model: RODRET Dimmer
+            - integration: zha
+              manufacturer: Signify Netherlands B.V.
+              model: RWL022
     target_lights:
       name: Target light entity
       selector:
