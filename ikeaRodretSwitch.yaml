@@ -115,6 +115,60 @@ actions:
       - conditions:
           - condition: trigger
             id:
+              - "off"
+          - condition: template
+            value_template: "{{ isToggle }}" 
+          - condition: numeric_state
+            entity_id: !input target_lights
+            attribute: color_temp_kelvin
+            above: -1
+            below: 2201     
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              kelvin: 2700
+            target:
+              entity_id: !input target_lights  
+      - conditions:
+          - condition: trigger
+            id:
+              - "off"
+          - condition: template
+            value_template: "{{ isToggle }}" 
+          - condition: numeric_state
+            entity_id: !input target_lights
+            attribute: color_temp_kelvin
+            above: 2201
+            below: 2701    
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              kelvin: 3500
+            target:
+              entity_id: !input target_lights
+      - conditions:
+          - condition: trigger
+            id:
+              - "off"
+          - condition: template
+            value_template: "{{ isToggle }}" 
+          - condition: numeric_state
+            entity_id: !input target_lights
+            attribute: color_temp_kelvin
+            above: 2701
+            below: 999999  
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              kelvin: 2200
+            target:
+              entity_id: !input target_lights                          
+      - conditions:
+          - condition: trigger
+            id:
               - dimDownStart
         sequence:
           - repeat:
