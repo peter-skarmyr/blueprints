@@ -112,11 +112,9 @@ variables:
 actions:
   - choose:
       - conditions:
-        - condition: and
-          conditions:
-          - condition: trigger
-            id:
-              - "on"
+        - condition: trigger
+          id:
+            - "on"
         - condition: template
           value_template: "{{ not IsOnButtonToggle }}"   
         sequence:
@@ -126,11 +124,9 @@ actions:
             target: 
               entity_id: !input target_lights
       - conditions:
-        - condition: and
-          conditions:
-          - condition: trigger
-            id:
-              - "on"
+        - condition: trigger
+          id:
+            - "on"
         - condition: template
           value_template: "{{ IsOnButtonToggle }}"   
         sequence:
