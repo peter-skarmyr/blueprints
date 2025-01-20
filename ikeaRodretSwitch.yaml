@@ -299,24 +299,7 @@ actions:
                         - condition: numeric_state
                           entity_id: !input target_lights
                           attribute: brightness
-                          above: 210
-                          below: 254
-                      sequence:
-                        - action: light.turn_on
-                          metadata: {}
-                          data:
-                            transition: !input iterationTimeInSeconds
-                            brightness: 255
-                          target:
-                            entity_id: !input target_lights
-                        - stop: At maximum brightness
-                          error: false
-                    - conditions:
-                        - condition: numeric_state
-                          entity_id: !input target_lights
-                          attribute: brightness
                           above: 254
-                          below: 9999
                       sequence:
                         - stop: At maximum brightness
                           error: false      
