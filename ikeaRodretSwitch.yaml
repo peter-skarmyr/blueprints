@@ -54,10 +54,22 @@ triggers:
     id: dimUpStart
   - device_id: !input switch
     domain: zha
+    type: remote_button_short_press
+    subtype: dim_up
+    trigger: device
+    id: dimUpShort 
+  - device_id: !input switch
+    domain: zha
     type: remote_button_long_release
     subtype: dim_up
     trigger: device
     id: dimUpStop
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_short_release
+    subtype: dim_down
+    trigger: device
+    id: dimUpShort
   - device_id: !input switch
     domain: zha
     type: remote_button_long_press
@@ -168,7 +180,29 @@ actions:
             data:
               kelvin: 2200
             target:
-              entity_id: !input target_lights                          
+              entity_id: !input target_lights 
+      - conditions:
+          - condition: trigger
+            id:
+              - "dimDownShort"
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              brightness_step_pct: "-20"
+            target:
+              entity_id: !input target_lights  
+      - conditions:
+          - condition: trigger
+            id:
+              - "dimUpShort"
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              brightness_step_pct: "20"
+            target:
+              entity_id: !input target_lights                                         
       - conditions:
           - condition: trigger
             id:
