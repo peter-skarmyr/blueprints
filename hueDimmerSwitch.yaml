@@ -94,8 +94,8 @@ triggers:
     id: dimDownStop
 conditions: []
 variables: 
-  IsOnButtonToggle: !input IsOnButtonToggle
-  IsOffButtonColorTemperatureSwitch: !input IsOffButtonColorTemperatureSwitch
+  dimStepPercentageHold: !input dimStepPercentageHold
+  dimStepPercentagePress: !input dimStepPercentagePress
 actions:
   - choose:
       - conditions:

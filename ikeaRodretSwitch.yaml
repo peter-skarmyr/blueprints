@@ -72,6 +72,8 @@ triggers:
     trigger: device
     id: dimDownStop
 conditions: []
+variables: 
+  dimStepPercentageHold: !input dimStepPercentageHold
 actions:
   - choose:
       - conditions:
