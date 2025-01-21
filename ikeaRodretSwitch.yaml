@@ -49,7 +49,7 @@ triggers:
     id: "off"
   - device_id: !input switch
     domain: zha
-    type: remote_button_long_press
+    type: remote_button_long_press  
     subtype: dim_up
     trigger: device
     id: dimUpStart
@@ -72,9 +72,6 @@ triggers:
     trigger: device
     id: dimDownStop
 conditions: []
-variables: 
-  IsOnButtonToggle: !input IsOnButtonToggle
-  IsOffButtonColorTemperatureSwitch: !input IsOffButtonColorTemperatureSwitch
 actions:
   - choose:
       - conditions:
