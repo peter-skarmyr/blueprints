@@ -161,7 +161,7 @@ actions:
                 entity_id: !input target_lights
                 attribute: brightness
                 above: input_number.dimStepPercentagePress
-                value_template: "{{ TODO }}"
+                value_template: "{{ (float(state.state) * 100 / 255) - 1 }}"
               sequence:  
                 - action: light.turn_on
                   metadata: {}
@@ -200,7 +200,6 @@ actions:
                         - condition: numeric_state
                           entity_id: !input target_lights
                           attribute: brightness
-                          above: -9999
                           below: 2
                       sequence:
                         - stop: Minimum brightness
@@ -208,8 +207,8 @@ actions:
                         - condition: numeric_state
                           entity_id: !input target_lights
                           attribute: brightness
-                          above: 2
-                          below: 52
+                          below: !input dimStepPercentageHold
+                          value_template: "{{ (float(state.state) * 100 / 255) - 1 }}"
                       sequence:
                         - action: light.turn_on
                           metadata: {}
