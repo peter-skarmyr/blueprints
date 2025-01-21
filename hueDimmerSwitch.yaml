@@ -1,5 +1,5 @@
 blueprint:
-  name: Philips hue switch
+  name: Philips Hue Dimmer Switch
   domain: automation  
   input:
     switch:
@@ -35,7 +35,7 @@ blueprint:
           step: 5
           unit_of_measurement: "%"
     dimStepPercentagePress:
-      name: How much to dim press 
+      name: How much to dim per short press 
       default: 25
       selector:
         number:

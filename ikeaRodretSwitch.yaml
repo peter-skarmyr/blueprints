@@ -7,12 +7,9 @@ blueprint:
       selector:
         device:
           filter:
-            - integration: zha
-              manufacturer: IKEA of Sweden
-              model: RODRET Dimmer
-            - integration: zha
-              manufacturer: Signify Netherlands B.V.
-              model: RWL022
+            integration: zha
+            manufacturer: IKEA of Sweden
+            model: RODRET Dimmer
     target_lights:
       name: Target light entity
       selector:
@@ -37,25 +34,6 @@ blueprint:
           max: 50
           step: 5
           unit_of_measurement: "%"
-    dimStepPercentagePress:
-      name: How much to dim press 
-      default: 25
-      selector:
-        number:
-          min: 20
-          max: 50
-          step: 5
-          unit_of_measurement: "%"            
-    IsOnButtonToggle:
-      name: Is on button toggle?
-      default: false
-      selector:
-        boolean:
-    IsOffButtonColorTemperatureSwitch:
-      name: Is off button used to switch color temperature?
-      default: false
-      selector:
-        boolean:    
 triggers:
   - device_id: !input switch
     domain: zha
@@ -77,22 +55,10 @@ triggers:
     id: dimUpStart
   - device_id: !input switch
     domain: zha
-    type: remote_button_short_press
-    subtype: dim_up
-    trigger: device
-    id: dimUpShort 
-  - device_id: !input switch
-    domain: zha
     type: remote_button_long_release
     subtype: dim_up
     trigger: device
     id: dimUpStop
-  - device_id: !input switch
-    domain: zha
-    type: remote_button_short_release
-    subtype: dim_down
-    trigger: device
-    id: dimUpShort
   - device_id: !input switch
     domain: zha
     type: remote_button_long_press
@@ -115,22 +81,8 @@ actions:
         - condition: trigger
           id:
             - "on"
-        - condition: template
-          value_template: "{{ not IsOnButtonToggle }}"   
         sequence:
           - action: light.turn_on
-            metadata: {}
-            data: {}
-            target: 
-              entity_id: !input target_lights
-      - conditions:
-        - condition: trigger
-          id:
-            - "on"
-        - condition: template
-          value_template: "{{ IsOnButtonToggle }}"   
-        sequence:
-          - action: light.toggle
             metadata: {}
             data: {}
             target: 
@@ -139,107 +91,10 @@ actions:
           - condition: trigger
             id:
               - "off"
-          - condition: template
-            value_template: "{{ not IsOffButtonColorTemperatureSwitch }}"    
         sequence:
           - action: light.turn_off
             metadata: {}
             data: {}
-            target:
-              entity_id: !input target_lights
-      - conditions:
-          - condition: trigger
-            id:
-              - "off"
-          - condition: template
-            value_template: "{{ IsOffButtonColorTemperatureSwitch }}" 
-          - condition: numeric_state
-            entity_id: !input target_lights
-            attribute: color_temp_kelvin
-            above: -1
-            below: 2201     
-        sequence:
-          - action: light.turn_on
-            metadata: {}
-            data:
-              kelvin: 2700
-            target:
-              entity_id: !input target_lights  
-      - conditions:
-          - condition: trigger
-            id:
-              - "off"
-          - condition: template
-            value_template: "{{ IsOffButtonColorTemperatureSwitch }}" 
-          - condition: numeric_state
-            entity_id: !input target_lights
-            attribute: color_temp_kelvin
-            above: 2201
-            below: 2701    
-        sequence:
-          - action: light.turn_on
-            metadata: {}
-            data:
-              kelvin: 3500
-            target:
-              entity_id: !input target_lights
-      - conditions:
-          - condition: trigger
-            id:
-              - "off"
-          - condition: template
-            value_template: "{{ IsOffButtonColorTemperatureSwitch }}" 
-          - condition: numeric_state
-            entity_id: !input target_lights
-            attribute: color_temp_kelvin
-            above: 2701
-            below: 999999  
-        sequence:
-          - action: light.turn_on
-            metadata: {}
-            data:
-              kelvin: 2200
-            target:
-              entity_id: !input target_lights 
-      - conditions:
-          - condition: trigger
-            id:
-              - "dimDownShort"
-          - condition: numeric_state
-            entity_id: !input target_lights
-            attribute: brightness
-            above: input_number.dimStepPercentagePress
-            below: 99999
-        sequence:
-          - choose: 
-            - conditions:
-              - condition: numeric_state
-                entity_id: !input target_lights
-                attribute: brightness
-                below: input_number.dimStepPercentagePress
-              sequence:  
-                - action: light.turn_on
-                  metadata: {}
-                  data:
-                    brightness_step_pct: "{{ -(dimStepPercentagePress) }}" 
-                  target:
-                    entity_id: !input target_lights  
-            default:
-              - action: light.turn_on
-                metadata: {}
-                data:
-                  brightness: 1
-                target:
-                  entity_id: !input target_lights        
-      - conditions:
-          - condition: trigger
-            id:
-              - "dimUpShort"
-        sequence:
-          - action: light.turn_on
-            metadata: {}
-            data:
-              brightness_step_pct: !input dimStepPercentagePress
             target:
               entity_id: !input target_lights                                         
       - conditions:
