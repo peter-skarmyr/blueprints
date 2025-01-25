@@ -1,168 +1,152 @@
-blueprint:
-  name: Ikea Rodret Switch
-  domain: automation  
-  input:
-    switch:
-      name: Light switch
-      selector:
-        device:
-          filter:
-            integration: zha
-            manufacturer: IKEA of Sweden
-            model: RODRET Dimmer
-    target_lights:
-      name: Target light entity
-      selector:
-        entity:
-          filter:
-            domain: light
-    iterationTimeInSeconds:
-      name: Time per iteration in seconds
-      default: 1.1
-      selector:
-        number:
-          min: 1
-          max: 5
-          step: 0.1
-          unit_of_measurement: s
-    dimStepPercentageHold:
-      name: How much to dim per iteration when holding to dim
-      default: 25
-      selector:
-        number:
-          min: 20
-          max: 50
-          step: 5
-          unit_of_measurement: "%"
-triggers:
-  - device_id: !input switch
-    domain: zha
-    type: remote_button_short_press
-    subtype: turn_on
-    trigger: device
-    id: "on"
-  - device_id: !input switch
-    domain: zha
-    type: remote_button_short_press
-    subtype: turn_off
-    trigger: device
-    id: "off"
-  - device_id: !input switch
-    domain: zha
-    type: remote_button_long_press  
-    subtype: dim_up
-    trigger: device
-    id: dimUpStart
-  - device_id: !input switch
-    domain: zha
-    type: remote_button_long_release
-    subtype: dim_up
-    trigger: device
-    id: dimUpStop
-  - device_id: !input switch
-    domain: zha
-    type: remote_button_long_press
-    subtype: dim_down
-    trigger: device
-    id: dimDownStart
-  - device_id: !input switch
-    domain: zha
-    type: remote_button_long_release
-    subtype: dim_down
-    trigger: device
-    id: dimDownStop
-conditions: []
-variables: 
-  dimStepPercentageHold: !input dimStepPercentageHold
-actions:
-  - choose:
-      - conditions:
-        - condition: trigger
-          id:
-            - "on"
-        sequence:
-          - action: light.turn_on
-            metadata: {}
-            data: {}
-            target: 
-              entity_id: !input target_lights
-      - conditions:
+  blueprint:
+    name: Ikea Rodret Switch
+    domain: automation  
+    input:
+      switch:
+        name: Light switch
+        selector:
+          device:
+            filter:
+              integration: zha
+              manufacturer: IKEA of Sweden
+              model: RODRET Dimmer
+      target_lights:
+        name: Target light entity
+        selector:
+          entity:
+            filter:
+              domain: light
+  triggers:
+    - device_id: !input switch
+      domain: zha
+      type: remote_button_short_press
+      subtype: turn_on
+      trigger: device
+      id: "on"
+    - device_id: !input switch
+      domain: zha
+      type: remote_button_short_press
+      subtype: turn_off
+      trigger: device
+      id: "off"
+    - device_id: !input switch
+      domain: zha
+      type: remote_button_long_press  
+      subtype: dim_up
+      trigger: device
+      id: dimUpStart
+    - device_id: !input switch
+      domain: zha
+      type: remote_button_long_release
+      subtype: dim_up
+      trigger: device
+      id: dimUpStop
+    - device_id: !input switch
+      domain: zha
+      type: remote_button_long_press
+      subtype: dim_down
+      trigger: device
+      id: dimDownStart
+    - device_id: !input switch
+      domain: zha
+      type: remote_button_long_release
+      subtype: dim_down
+      trigger: device
+      id: dimDownStop
+  conditions: []
+  variables: 
+    dimStepPercentageHold: 25
+    iterationTimeInSeconds: 1.1
+    dimDownThreshold: 65
+  actions:
+    - choose:
+        - conditions:
           - condition: trigger
             id:
-              - "off"
-        sequence:
-          - action: light.turn_off
-            metadata: {}
-            data: {}
-            target:
-              entity_id: !input target_lights                                         
-      - conditions:
-          - condition: trigger
-            id:
-              - dimDownStart
-        sequence:
-          - repeat:
-              count: 5
-              sequence:
-                - choose:
-                    - conditions:
-                        - condition: numeric_state
-                          entity_id: !input target_lights
-                          attribute: brightness
-                          below: 2
-                      sequence:
-                        - stop: Minimum brightness
-                    - conditions:
-                        - condition: numeric_state
-                          entity_id: !input target_lights
-                          attribute: brightness
-                          below: 65
-                      sequence:
-                        - action: light.turn_on
-                          metadata: {}
-                          data:
-                            transition: !input iterationTimeInSeconds
-                            brightness: 1
-                          target:
+              - "on"
+          sequence:
+            - action: light.turn_on
+              metadata: {}
+              data: {}
+              target: 
+                entity_id: !input target_lights
+        - conditions:
+            - condition: trigger
+              id:
+                - "off"
+          sequence:
+            - action: light.turn_off
+              metadata: {}
+              data: {}
+              target:
+                entity_id: !input target_lights                                         
+        - conditions:
+            - condition: trigger
+              id:
+                - dimDownStart
+          sequence:
+            - repeat:
+                count: 5
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: numeric_state
                             entity_id: !input target_lights
-                        - stop: Minimum brightness
-                  default:
-                    - action: light.turn_on
-                      metadata: {}
-                      data:
-                        brightness_step_pct: "{{ -(dimStepPercentageHold) }}"
-                        transition: !input iterationTimeInSeconds
-                      target:
-                        entity_id: !input target_lights
-                    - delay:
-                        hours: 0
-                        minutes: 0
-                        seconds: !input iterationTimeInSeconds
-      - conditions:
-          - condition: trigger
-            id:
-              - dimUpStart
-        sequence:
-          - repeat:
-              count: 5
-              sequence:
-                - choose:
-                    - conditions:
-                        - condition: numeric_state
+                            attribute: brightness
+                            below: 2
+                        sequence:
+                          - stop: Minimum brightness
+                      - conditions:
+                          - condition: numeric_state
+                            entity_id: !input target_lights
+                            attribute: brightness
+                            below: "{{ dimDownThreshold }}"
+                        sequence:
+                          - action: light.turn_on
+                            metadata: {}
+                            data:
+                              transition: "{{ iterationTimeInSeconds }}"
+                              brightness: 1
+                            target:
+                              entity_id: !input target_lights
+                          - stop: Minimum brightness
+                    default:
+                      - action: light.turn_on
+                        metadata: {}
+                        data:
+                          brightness_step_pct: "{{ -(dimStepPercentageHold) }}"
+                          transition: "{{ iterationTimeInSeconds }}"
+                        target:
                           entity_id: !input target_lights
-                          attribute: brightness
-                          above: 254
-                      sequence:
-                        - stop: At maximum brightness
-                          error: false      
-                  default:
-                    - action: light.turn_on
-                      metadata: {}
-                      data:
-                        brightness_step_pct: !input dimStepPercentageHold
-                        transition: !input iterationTimeInSeconds
-                      target:
-                        entity_id: !input target_lights
-                    - delay:
-                        seconds: !input iterationTimeInSeconds
-mode: restart
+                      - delay:
+                          hours: 0
+                          minutes: 0
+                          seconds: "{{ iterationTimeInSeconds }}"
+        - conditions:
+            - condition: trigger
+              id:
+                - dimUpStart
+          sequence:
+            - repeat:
+                count: 5
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: numeric_state
+                            entity_id: !input target_lights
+                            attribute: brightness
+                            above: 254
+                        sequence:
+                          - stop: At maximum brightness
+                            error: false      
+                    default:
+                      - action: light.turn_on
+                        metadata: {}
+                        data:
+                          brightness_step_pct: "{{ dimStepPercentageHold }}"
+                          transition: "{{ iterationTimeInSeconds }}"
+                        target:
+                          entity_id: !input target_lights
+                      - delay:
+                          seconds: "{{ iterationTimeInSeconds }}"
+  mode: restart
