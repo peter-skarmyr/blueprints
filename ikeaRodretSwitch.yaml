@@ -57,7 +57,7 @@
   variables: 
     dimStepPercentageHold: 25
     iterationTimeInSeconds: 1.1
-    dimDownThreshold: 65
+    dimDownThreshold: 65.0
   actions:
     - choose:
         - conditions:
