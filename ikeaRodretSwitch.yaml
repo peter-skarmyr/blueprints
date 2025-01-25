@@ -57,7 +57,6 @@
   variables: 
     dimStepPercentageHold: 25
     iterationTimeInSeconds: 1.1
-    dimDownThreshold: 65.0
   actions:
     - choose:
         - conditions:
@@ -100,7 +99,7 @@
                           - condition: numeric_state
                             entity_id: !input target_lights
                             attribute: brightness
-                            below: "{{ dimDownThreshold }}"
+                            below: 65
                         sequence:
                           - action: light.turn_on
                             metadata: {}
