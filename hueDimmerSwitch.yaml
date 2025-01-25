@@ -86,7 +86,6 @@ actions:
           - condition: trigger
             id:
               - "off"
-            entity_id: !input target_lights   
         sequence:
           - choose:
             - conditions:
