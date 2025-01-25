@@ -160,8 +160,8 @@ actions:
               - condition: numeric_state
                 entity_id: !input target_lights
                 attribute: brightness
-                above: input_number.dimStepPercentagePress
-                value_template: "{{ (float(state.brightness) * 100 / 255) - 1 }}"
+                above: 65
+                value_template: 
               sequence:  
                 - action: light.turn_on
                   metadata: {}
@@ -207,8 +207,7 @@ actions:
                         - condition: numeric_state
                           entity_id: !input target_lights
                           attribute: brightness
-                          below: !input dimStepPercentageHold
-                          value_template: "{{ (float(state.state) * 100 / 255) - 1 }}"
+                          below: 65
                       sequence:
                         - action: light.turn_on
                           metadata: {}
