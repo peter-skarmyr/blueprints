@@ -161,7 +161,7 @@ actions:
                 entity_id: !input target_lights
                 attribute: brightness
                 above: input_number.dimStepPercentagePress
-                value_template: "{{ (float(state.state.brightness) * 100 / 255) - 1 }}"
+                value_template: "{{ (float(state.brightness) * 100 / 255) - 1 }}"
               sequence:  
                 - action: light.turn_on
                   metadata: {}
