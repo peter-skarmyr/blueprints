@@ -165,7 +165,5 @@ actions:
                       target:
                         entity_id: !input target_lights
                     - delay:
-                        hours: 0
-                        minutes: 0
                         seconds: !input iterationTimeInSeconds
 mode: restart
