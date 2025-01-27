@@ -73,7 +73,7 @@ triggers:
     id: dimUpShort 
   - device_id: !input switch
     domain: zha
-    type: remote_button_tripple_press
+    type: remote_button_triple_press
     subtype: dim_up
     trigger: device
     id: dimUpShort
@@ -103,7 +103,7 @@ triggers:
     id: dimDownShort
   - device_id: !input switch
     domain: zha
-    type: remote_button_tripple_press
+    type: remote_button_triple_press
     subtype: dim_down
     trigger: device
     id: dimDownShort
