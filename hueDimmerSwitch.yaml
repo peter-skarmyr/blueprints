@@ -89,9 +89,7 @@ actions:
         sequence:
           - choose:
             - conditions:
-              - condition: trigger
-                id:
-                  - "off"
+              - condition: numeric_state
                 entity_id: !input target_lights
                 attribute: color_temp_kelvin
                 below: 2201   
@@ -103,9 +101,7 @@ actions:
                   target:
                     entity_id: !input target_lights
             - conditions:
-              - condition: trigger
-                id:
-                  - "off"
+              - condition: numeric_state
                 entity_id: !input target_lights
                 attribute: color_temp_kelvin
                 above: 3499   
@@ -134,7 +130,6 @@ actions:
                 entity_id: !input target_lights
                 attribute: brightness
                 above: 65
-                value_template: 
               sequence:  
                 - action: light.turn_on
                   metadata: {}
