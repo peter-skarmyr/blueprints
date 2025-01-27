@@ -31,6 +31,30 @@ triggers:
     id: "off"
   - device_id: !input switch
     domain: zha
+    type: remote_button_double_press
+    subtype: turn_off
+    trigger: device
+    id: "off"
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_tripple_press
+    subtype: turn_off
+    trigger: device
+    id: "off"
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_quadruple_press
+    subtype: turn_off
+    trigger: device
+    id: "off"
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_quintuple_press
+    subtype: turn_off
+    trigger: device
+    id: "off"
+  - device_id: !input switch
+    domain: zha
     type: remote_button_long_press
     subtype: dim_up
     trigger: device
@@ -40,13 +64,61 @@ triggers:
     type: remote_button_short_press
     subtype: dim_up
     trigger: device
+    id: dimUpShort
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_double_press
+    subtype: dim_up
+    trigger: device
     id: dimUpShort 
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_tripple_press
+    subtype: dim_up
+    trigger: device
+    id: dimUpShort
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_quadruple_press
+    subtype: dim_up
+    trigger: device
+    id: dimUpShort 
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_quintuple_press
+    subtype: dim_up
+    trigger: device
+    id: dimUpShort        
   - device_id: !input switch
     domain: zha
     type: remote_button_short_press
     subtype: dim_down
     trigger: device
     id: dimDownShort 
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_double_press
+    subtype: dim_down
+    trigger: device
+    id: dimDownShort
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_tripple_press
+    subtype: dim_down
+    trigger: device
+    id: dimDownShort
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_quadruple_press
+    subtype: dim_down
+    trigger: device
+    id: dimDownShort
+  - device_id: !input switch
+    domain: zha
+    type: remote_button_quintuple_press
+    subtype: dim_down
+    trigger: device
+    id: dimDownShort
   - device_id: !input switch
     domain: zha
     type: remote_button_long_release
