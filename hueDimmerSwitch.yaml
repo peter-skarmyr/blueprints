@@ -37,7 +37,7 @@ triggers:
     id: "off"
   - device_id: !input switch
     domain: zha
-    type: remote_button_tripple_press
+    type: remote_button_triple_press
     subtype: turn_off
     trigger: device
     id: "off"
