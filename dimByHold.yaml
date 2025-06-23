@@ -1,0 +1,122 @@
+  blueprint:
+    name: Dim by hold
+    domain: automation  
+    input:
+      switch:
+        name: Light switch
+        selector:
+          device:
+            filter:
+              - integration: zha
+                manufacturer: IKEA of Sweden
+                model: RODRET Dimmer
+              - integration: zha
+                manufacturer: Signify Netherlands B.V.
+                model: RWL022
+      target_lights:
+        name: Target light entity
+        selector:
+          entity:
+            filter:
+              domain: light
+  triggers:
+    - device_id: !input switch
+      domain: zha
+      type: remote_button_long_press  
+      subtype: dim_up
+      trigger: device
+      id: dimUpStart
+    - device_id: !input switch
+      domain: zha
+      type: remote_button_long_release
+      subtype: dim_up
+      trigger: device
+      id: dimUpStop
+    - device_id: !input switch
+      domain: zha
+      type: remote_button_long_press
+      subtype: dim_down
+      trigger: device
+      id: dimDownStart
+    - device_id: !input switch
+      domain: zha
+      type: remote_button_long_release
+      subtype: dim_down
+      trigger: device
+      id: dimDownStop
+  conditions: []
+  variables: 
+    dimStepPercentageHold: 25
+    iterationTimeInSeconds: 1.1
+  actions:
+    - choose:                             
+        - conditions:
+            - condition: trigger
+              id:
+                - dimDownStart
+          sequence:
+            - repeat:
+                count: 5
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: numeric_state
+                            entity_id: !input target_lights
+                            attribute: brightness
+                            below: 2
+                        sequence:
+                          - stop: Minimum brightness
+                      - conditions:
+                          - condition: numeric_state
+                            entity_id: !input target_lights
+                            attribute: brightness
+                            below: 65
+                        sequence:
+                          - action: light.turn_on
+                            metadata: {}
+                            data:
+                              transition: "{{ iterationTimeInSeconds }}"
+                              brightness: 1
+                            target:
+                              entity_id: !input target_lights
+                          - stop: Minimum brightness
+                    default:
+                      - action: light.turn_on
+                        metadata: {}
+                        data:
+                          brightness_step_pct: "{{ -(dimStepPercentageHold) }}"
+                          transition: "{{ iterationTimeInSeconds }}"
+                        target:
+                          entity_id: !input target_lights
+                      - delay:
+                          hours: 0
+                          minutes: 0
+                          seconds: "{{ iterationTimeInSeconds }}"
+        - conditions:
+            - condition: trigger
+              id:
+                - dimUpStart
+          sequence:
+            - repeat:
+                count: 5
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: numeric_state
+                            entity_id: !input target_lights
+                            attribute: brightness
+                            above: 254
+                        sequence:
+                          - stop: At maximum brightness
+                            error: false      
+                    default:
+                      - action: light.turn_on
+                        metadata: {}
+                        data:
+                          brightness_step_pct: "{{ dimStepPercentageHold }}"
+                          transition: "{{ iterationTimeInSeconds }}"
+                        target:
+                          entity_id: !input target_lights
+                      - delay:
+                          seconds: "{{ iterationTimeInSeconds }}"
+  mode: restart
