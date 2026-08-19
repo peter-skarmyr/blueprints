@@ -143,7 +143,7 @@ actions:
                 - action: light.turn_on
                   metadata: {}
                   data:
-                    kelvin: 2702
+                    color_temp_kelvin: 2702
                   target:
                     entity_id: !input target_lights
             - conditions:
@@ -155,14 +155,14 @@ actions:
                 - action: light.turn_on
                   metadata: {}
                   data:
-                    kelvin: 2439
+                    color_temp_kelvin: 2439
                   target:
                     entity_id: !input target_lights 
             default:
               - action: light.turn_on
                 metadata: {}
                 data:
-                  kelvin: 4000
+                  color_temp_kelvin: 4000
                 target:
                   entity_id: !input target_lights                  
       - conditions:
