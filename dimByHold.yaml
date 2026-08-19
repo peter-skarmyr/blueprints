@@ -49,7 +49,15 @@
     dimStepPercentageHold: 25
     iterationTimeInSeconds: 1.1
   actions:
-    - choose:                             
+    - choose:
+        - conditions:
+            - condition: trigger
+              id:
+                - dimDownStop
+                - dimUpStop
+          sequence:
+            - stop: Stop dimming
+              error: false
         - conditions:
             - condition: trigger
               id:
@@ -65,7 +73,15 @@
                             attribute: brightness
                             below: 2
                         sequence:
+                          - action: light.turn_on
+                            metadata: {}
+                            data:
+                              transition: "{{ iterationTimeInSeconds }}"
+                              brightness: 1
+                            target:
+                              entity_id: !input target_lights
                           - stop: Minimum brightness
+                            error: false
                       - conditions:
                           - condition: numeric_state
                             entity_id: !input target_lights
@@ -80,6 +96,7 @@
                             target:
                               entity_id: !input target_lights
                           - stop: Minimum brightness
+                            error: false
                     default:
                       - action: light.turn_on
                         metadata: {}
@@ -108,7 +125,7 @@
                             above: 254
                         sequence:
                           - stop: At maximum brightness
-                            error: false      
+                            error: false
                     default:
                       - action: light.turn_on
                         metadata: {}
