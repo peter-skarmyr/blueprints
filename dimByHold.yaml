@@ -48,6 +48,7 @@
   variables: 
     dimStepPercentageHold: 25
     iterationTimeInSeconds: 1.1
+    target_lights: !input target_lights
   actions:
     - choose:
         - conditions:
@@ -73,35 +74,17 @@
                             attribute: brightness
                             below: 2
                         sequence:
-                          - action: light.turn_on
-                            metadata: {}
-                            data:
-                              transition: "{{ iterationTimeInSeconds }}"
-                              brightness: 1
-                            target:
-                              entity_id: !input target_lights
-                          - stop: Minimum brightness
-                            error: false
-                      - conditions:
-                          - condition: numeric_state
-                            entity_id: !input target_lights
-                            attribute: brightness
-                            below: 65
-                        sequence:
-                          - action: light.turn_on
-                            metadata: {}
-                            data:
-                              transition: "{{ iterationTimeInSeconds }}"
-                              brightness: 1
-                            target:
-                              entity_id: !input target_lights
                           - stop: Minimum brightness
                             error: false
                     default:
                       - action: light.turn_on
                         metadata: {}
                         data:
-                          brightness_step_pct: "{{ -(dimStepPercentageHold) }}"
+                          # Compute the next brightness explicitly and floor it at 1 so we
+                          # never send brightness: 0, which Home Assistant silently turns
+                          # into light.turn_off with no visible action in the trace.
+                          brightness: >-
+                            {{ [1, ((state_attr(target_lights, 'brightness') | int(1)) - (255 * dimStepPercentageHold / 100)) | round(0, 'floor') | int] | max }}
                           transition: "{{ iterationTimeInSeconds }}"
                         target:
                           entity_id: !input target_lights
