@@ -1,6 +1,6 @@
 blueprint:
   name: Philips Hue Dimmer Switch
-  domain: automation  
+  domain: automation
   input:
     switch:
       name: Light switch
@@ -64,69 +64,69 @@ triggers:
     type: remote_button_double_press
     subtype: dim_up
     trigger: device
-    id: dimUpShort 
+    id: dimUpMulti
   - device_id: !input switch
     domain: zha
     type: remote_button_triple_press
     subtype: dim_up
     trigger: device
-    id: dimUpShort
+    id: dimUpMulti
   - device_id: !input switch
     domain: zha
     type: remote_button_quadruple_press
     subtype: dim_up
     trigger: device
-    id: dimUpShort 
+    id: dimUpMulti
   - device_id: !input switch
     domain: zha
     type: remote_button_quintuple_press
     subtype: dim_up
     trigger: device
-    id: dimUpShort        
+    id: dimUpMulti
   - device_id: !input switch
     domain: zha
     type: remote_button_short_press
     subtype: dim_down
     trigger: device
-    id: dimDownShort 
+    id: dimDownShort
   - device_id: !input switch
     domain: zha
     type: remote_button_double_press
     subtype: dim_down
     trigger: device
-    id: dimDownShort
+    id: dimDownMulti
   - device_id: !input switch
     domain: zha
     type: remote_button_triple_press
     subtype: dim_down
     trigger: device
-    id: dimDownShort
+    id: dimDownMulti
   - device_id: !input switch
     domain: zha
     type: remote_button_quadruple_press
     subtype: dim_down
     trigger: device
-    id: dimDownShort
+    id: dimDownMulti
   - device_id: !input switch
     domain: zha
     type: remote_button_quintuple_press
     subtype: dim_down
     trigger: device
-    id: dimDownShort
+    id: dimDownMulti
 conditions: []
-variables: 
+variables:
   dimStepPercentagePress: 25
 actions:
   - choose:
       - conditions:
-        - condition: trigger
-          id:
-            - "on"
+          - condition: trigger
+            id:
+              - "on"
         sequence:
           - action: light.toggle
             metadata: {}
             data: {}
-            target: 
+            target:
               entity_id: !input target_lights
       - conditions:
           - condition: trigger
@@ -134,62 +134,62 @@ actions:
               - "off"
         sequence:
           - choose:
-            - conditions:
-              - condition: numeric_state
-                entity_id: !input target_lights
-                attribute: color_temp_kelvin
-                below: 2440   
-              sequence:
-                - action: light.turn_on
-                  metadata: {}
-                  data:
-                    color_temp_kelvin: 2702
-                  target:
+              - conditions:
+                  - condition: numeric_state
                     entity_id: !input target_lights
-            - conditions:
-              - condition: numeric_state
-                entity_id: !input target_lights
-                attribute: color_temp_kelvin
-                above: 3999
-              sequence:
-                - action: light.turn_on
-                  metadata: {}
-                  data:
-                    color_temp_kelvin: 2439
-                  target:
-                    entity_id: !input target_lights 
+                    attribute: color_temp_kelvin
+                    below: 2440
+                sequence:
+                  - action: light.turn_on
+                    metadata: {}
+                    data:
+                      color_temp_kelvin: 2702
+                    target:
+                      entity_id: !input target_lights
+              - conditions:
+                  - condition: numeric_state
+                    entity_id: !input target_lights
+                    attribute: color_temp_kelvin
+                    above: 3999
+                sequence:
+                  - action: light.turn_on
+                    metadata: {}
+                    data:
+                      color_temp_kelvin: 2439
+                    target:
+                      entity_id: !input target_lights
             default:
               - action: light.turn_on
                 metadata: {}
                 data:
                   color_temp_kelvin: 4000
                 target:
-                  entity_id: !input target_lights                  
+                  entity_id: !input target_lights
       - conditions:
           - condition: trigger
             id:
               - "dimDownShort"
         sequence:
-          - choose: 
-            - conditions:
-              - condition: numeric_state
-                entity_id: !input target_lights
-                attribute: brightness
-                above: 65
-              sequence:  
-                - action: light.turn_on
-                  metadata: {}
-                  data:
-                    brightness_step_pct: "{{ -(dimStepPercentagePress) }}" 
-                  target:
-                    entity_id: !input target_lights  
+          - choose:
+              - conditions:
+                  - condition: numeric_state
+                    entity_id: !input target_lights
+                    attribute: brightness
+                    above: 65
+                sequence:
+                  - action: light.turn_on
+                    metadata: {}
+                    data:
+                      brightness_step_pct: "{{ -(dimStepPercentagePress) }}"
+                    target:
+                      entity_id: !input target_lights
             default:
               - action: light.turn_on
                 metadata: {}
                 data:
                   brightness: 1
                 target:
-                  entity_id: !input target_lights        
+                  entity_id: !input target_lights
       - conditions:
           - condition: trigger
             id:
@@ -200,4 +200,26 @@ actions:
             data:
               brightness_step_pct: "{{ dimStepPercentagePress }}"
             target:
-              entity_id: !input target_lights                                         
+              entity_id: !input target_lights
+      - conditions:
+          - condition: trigger
+            id:
+              - "dimDownMulti"
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              brightness: 1
+            target:
+              entity_id: !input target_lights
+      - conditions:
+          - condition: trigger
+            id:
+              - "dimUpMulti"
+        sequence:
+          - action: light.turn_on
+            metadata: {}
+            data:
+              brightness_pct: 100
+            target:
+              entity_id: !input target_lights
